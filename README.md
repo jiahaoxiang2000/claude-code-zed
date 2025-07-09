@@ -140,3 +140,91 @@ Zed Editor (WASM)  ←→  LSP  ←→  Native Server  ←→  WebSocket  ←→
 ### Messages from Zed to Claude Code
 
 - `selection_changed`: Notifies Claude when text selection changes
+
+## FAQ & Troubleshooting
+
+### Q: I'm getting a "Failed to compile Rust extension" error when installing
+
+**A:** This error typically occurs when Zed cannot compile the Rust extension to WebAssembly. Here are the solutions:
+
+#### Solution 1: Ensure you have the required Rust toolchain
+Make sure you have Rust installed with the `wasm32-wasi` target:
+
+```bash
+# Install Rust if you haven't already
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# Add the WebAssembly target
+rustup target add wasm32-wasi
+```
+
+#### Solution 2: Install the extension through Zed's extension manager (Recommended)
+Instead of installing from source, try installing the published extension:
+
+1. Open Zed editor
+2. Press `Cmd+Shift+P` (macOS) or `Ctrl+Shift+P` (Linux/Windows)
+3. Type "extensions" and select "zed: extensions"
+4. Search for "Claude Code" and install it directly
+
+#### Solution 3: Manual compilation check
+If you need to install from source, verify the extension compiles correctly:
+
+```bash
+cd claude-code-extension
+cargo check --target wasm32-wasi
+```
+
+If this fails, check that your Rust toolchain is up to date:
+```bash
+rustup update
+```
+
+#### Solution 4: macOS-specific installation using Homebrew
+For macOS users who encounter issues with the standard Rust installation, use Homebrew:
+
+```bash
+# Install rustup through Homebrew
+brew install rustup-init
+
+# Run rustup-init to complete the installation
+rustup-init
+
+# Add Cargo bin directory to your PATH
+echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> ~/.zshrc
+
+# Reload your shell configuration
+source ~/.zshrc
+
+# Add the WebAssembly target
+rustup target add wasm32-wasi
+```
+
+After installation, restart your terminal and try installing the Zed extension again.
+
+#### Solution 5: Clear Zed's extension cache
+Sometimes clearing the extension cache helps:
+
+1. Close Zed completely
+2. Remove the extension cache (location varies by OS):
+   - **macOS**: `~/Library/Application Support/Zed/extensions`
+   - **Linux**: `~/.local/share/zed/extensions`
+3. Restart Zed and try installing again
+
+### Q: The extension installs but doesn't seem to work
+
+**A:** Check the following:
+
+1. **Verify the extension is active**: Look for "Claude Code Server" in Zed's language server status
+2. **Check supported file types**: The extension only activates for `.rs`, `.js`, `.ts`, `.tsx`, `.py`, and `.md` files
+3. **Restart Zed**: Sometimes a restart is needed after installation
+4. **Check logs**: Open Zed's developer console to see any error messages
+
+### Q: How do I know if Claude Code CLI is connected?
+
+**A:** When properly connected, you should see:
+
+1. A lock file created at `~/.claude/ide/[port].lock`
+2. The Claude Code CLI will show IDE integration status
+3. Text selections in Zed will be visible to Claude Code CLI
+
+If you continue experiencing issues, please [open an issue](https://github.com/jiahaoxiang2000/claude-code-zed/issues) with your error details and system information.
